@@ -3,8 +3,8 @@
 module RuboCop
   module Cop
     module Rails
-      # This cop checks for the use of output safety calls like html_safe and
-      # raw.
+      # This cop checks for the use of output safety calls like html_safe,
+      # raw, and safe_concat.
       #
       # @example
       #   # bad
@@ -34,7 +34,8 @@ module RuboCop
 
           return unless !part_of_ignored_node?(node) &&
                         (looks_like_rails_html_safe?(node) ||
-                        looks_like_rails_raw?(node))
+                        looks_like_rails_raw?(node) ||
+                        looks_like_rails_safe_concat?(node))
 
           add_offense(node, :selector)
         end
@@ -47,6 +48,10 @@ module RuboCop
 
         def looks_like_rails_raw?(node)
           node.command?(:raw) && node.arguments.one?
+        end
+
+        def looks_like_rails_safe_concat?(node)
+          node.method?(:safe_concat) && node.arguments.one?
         end
       end
     end
